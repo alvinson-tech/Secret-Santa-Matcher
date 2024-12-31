@@ -6,6 +6,7 @@
     <title>Secret Santa Matcher ✨</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -47,12 +48,132 @@
         </div>
     </div>
 
-    <!-- New footer -->
     <div class="footer">
         Coded with ❤️ by Alvin
     </div>
 
     <script>
+        (function() {
+            emailjs.init("ufFSTjFy0xSRzcey3"); // Replace with your actual public key
+        })();
+
+        // Add this new function for sending emails
+        async function sendEmails() {
+            const emailProgress = document.createElement('div');
+            emailProgress.id = 'emailProgress';
+            emailProgress.style.marginTop = '20px';
+            emailProgress.style.padding = '10px';
+            emailProgress.style.backgroundColor = 'rgba(255,255,255,0.9)';
+            emailProgress.style.borderRadius = '8px';
+            document.getElementById('links').appendChild(emailProgress);
+
+            const linkItems = document.querySelectorAll('.link-item');
+            let successCount = 0;
+
+            for (const item of linkItems) {
+                const name = item.querySelector('strong').textContent.replace("'s Link", '');
+                const link = item.querySelector('span').textContent;
+                const email = classStudentsData[name]?.email;
+                
+                if (!email) {
+                    emailProgress.innerHTML += `<div style="color: red">⚠️ No email found for ${name}</div>`;
+                    continue;
+                }
+                
+                try {
+                    await emailjs.send(
+                        "service_f0z7tah", // Replace with your service ID
+                        "template_z4kspec", // Replace with your template ID
+                        {
+                            to_name: name,
+                            to_email: email,
+                            link: link
+                        }
+                    );
+                    successCount++;
+                    emailProgress.innerHTML += `<div style="color: green">✅ Sent to ${name}</div>`;
+                } catch (error) {
+                    emailProgress.innerHTML += `<div style="color: red">❌ Failed to send to ${name}: ${error.message}</div>`;
+                }
+            }
+
+            emailProgress.innerHTML += `<div style="margin-top: 10px; font-weight: bold;">Completed! Sent ${successCount} of ${linkItems.length} emails.</div>`;
+        }
+
+        const classStudentsData = {
+            "Mrs. Nikitha": { email: "" },
+            "Lavanya": { email: "" },
+            "Binusha": { email: "" },
+            "Aakanksha": { email: "" },
+            "Abdul Touheed": { email: "" },
+            "Abhishek A": { email: "" },
+            "Abhishek K": { email: "" },
+            "Abhishek S S": { email: "" },
+            "Aditya Suresh": { email: "" },
+            "Akash Surendra": { email: "" },
+            "Akshata Suresh": { email: "" },
+            "Akshay H": { email: "" },
+            "Alvin": { email: "" },
+            "Amulya": { email: "" },
+            "Anaghashree": { email: "" },
+            "Ananya": { email: "" },
+            "Aniketha": { email: "" },
+            "Ankita": { email: "" },
+            "Anushree": { email: "" },
+            "Aralur Darshankumar": { email: "" },
+            "Arfa Kulsum": { email: "" },
+            "Arjun Sharma": { email: "" },
+            "Arun Eshwaroop": { email: "" },
+            "Aviraj": { email: "" },
+            "Ayush": { email: "" },
+            "Balaji R": { email: "" },
+            "Bapugouda": { email: "" },
+            "Basavaraj": { email: "" },
+            "Basavaraj B": { email: "" },
+            "Bharath C": { email: "" },
+            "Bhargavi": { email: "" },
+            "Bhavana": { email: "" },
+            "Chandana Shree": { email: "" },
+            "Chandan D P": { email: "" },
+            "Channabasava": { email: "" },
+            "Chethankumar": { email: "" },
+            "Chethanashree": { email: "" },
+            "Chiranth L": { email: "" },
+            "Christy Shephard": { email: "" },
+            "D Manohar": { email: "" },
+            "D Neha": { email: "" },
+            "Danish": { email: "" },
+            "Darshan": { email: "" },
+            "Debaditya Das": { email: "" },
+            "Deekshita": { email: "" },
+            "Deepthi": { email: "" },
+            "Deeraj Ashok": { email: "" },
+            "Dhanush D": { email: "" },
+            "Dhanush Jain": { email: "" },
+            "Dharshan V": { email: "" },
+            "Dinesh Mange": { email: "" },
+            "Disha": { email: "" },
+            "E Vandana": { email: "" },
+            "Vishwanath": { email: "" },
+            "Abdulaziz": { email: "" },
+            "Abhishek Police Patil": { email: "" },
+            "Abhishek Gouda": { email: "" },
+            "Akbar": { email: "" },
+            "Arpita Suresh": { email: "" },
+            "Aryha K S": { email: "" },
+            "Ashish Gupta": { email: "" },
+            "Ayesha": { email: "" },
+            "Bhati Mohammed": { email: "" },
+            "Bhavana A V": { email: "" },
+            "Chandankumar V": { email: "" },
+            "Vishesh Dhyan": { email: "" },
+            "Darshan B": { email: "" },
+            "Darshan C": { email: "" },
+            "Darshan Chikanna": { email: "" },
+            "V Prajwal": { email: "" },
+            "Mythri": { email: "" }
+        };
+
         let participants = [];
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('c');
@@ -193,9 +314,15 @@
                 `;
                 linksGrid.appendChild(div);
             });
+
+            const emailButton = document.createElement('button');
+            emailButton.innerHTML = '📧 Send Emails to All';
+            emailButton.onclick = sendEmails;
+            emailButton.style.marginTop = '20px';
+            emailButton.style.backgroundColor = 'var(--holiday-blue)';
+            links.appendChild(emailButton);
         }
 
-        // And update the reveal function to work with the new format:
         function revealMatch() {
             try {
                 const decoded = atob(code.replace(/-/g, '+').replace(/_/g, '/'));
