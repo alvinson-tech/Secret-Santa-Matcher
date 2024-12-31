@@ -316,6 +316,20 @@ button:hover {
         margin-bottom: 20px;
     }
 
+    .sections-container {
+        flex-direction: column;
+    }
+
+    .preset-section, .manual-section {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .preset-section:last-child,
+    .manual-section:last-child {
+        margin-bottom: 0;
+    }
+
     .section-heading {
         font-size: 1em;
     }
@@ -341,9 +355,7 @@ button:hover {
     .gift-label {
         font-size: 0.9em;
     }
-}
 
-@media (max-width: 768px) {
     .name-reveal {
         font-size: 14px;
     }
@@ -358,6 +370,12 @@ button:hover {
     }
 }
 
+@media (max-width: 480px) {
+    .sections-container {
+        gap: 15px;
+    }
+}
+    
 @media (max-width: 360px) {
     body {
         font-size: 13px;
