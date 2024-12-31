@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Secret Santa Matcher ✨</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -256,22 +258,151 @@
         }
 
         @media (max-width: 768px) {
-            .participant-grid {
-                grid-template-columns: repeat(2, 1fr);
+            body {
+                padding: 10px;
             }
-        }
 
-        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+                margin: 10px 0;
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+
             .participant-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
             }
 
             h1 {
                 font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .section-heading {
+                font-size: 1.1em;
+                margin: 15px 0 10px;
+            }
+
+            .input-group {
+                margin: 15px 0;
+            }
+
+            input {
+                padding: 10px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 16px;
+                margin: 10px 0;
+            }
+
+            .link-item {
+                padding: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .link-text {
+                margin-bottom: 10px;
+                margin-right: 0;
+                width: 100%;
+                word-break: break-all;
+            }
+
+            .copy-btn {
+                align-self: flex-end;
+            }
+
+            .gift-box {
+                font-size: 80px;
+            }
+
+            .name-reveal {
+                font-size: 16px;
+                margin: 20px 10px;
+            }
+
+            .name-reveal h2 {
+                font-size: 1.6em;
+            }
+
+            .student-item {
+                padding: 10px;
+            }
+
+            .student-item label {
+                font-size: 14px;
+                line-height: 1.3;
+            }
+
+            /* Touch-friendly adjustments */
+            .student-item input[type="checkbox"] {
+                width: 24px;
+                height: 24px;
+                margin-right: 10px;
+            }
+
+            .copy-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            /* Improved spacing for touch targets */
+            button, 
+            .copy-btn,
+            .student-item,
+            input[type="checkbox"] {
+                min-height: 44px; /* iOS minimum touch target size */
+            }
+        }
+
+        /* Additional adjustments for very small screens */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.5em;
             }
 
             .container {
-                padding: 20px;
+                padding: 15px 10px;
+            }
+
+            .gift-box {
+                font-size: 60px;
+            }
+
+            .name-reveal {
+                font-size: 14px;
+            }
+
+            .name-reveal h2 {
+                font-size: 1.4em;
+            }
+        }
+
+        /* Fix for iOS input zoom */
+        @supports (-webkit-touch-callout: none) {
+            input, 
+            select, 
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Prevent pull-to-refresh on mobile */
+        html, body {
+            overscroll-behavior-y: contain;
+        }
+
+        /* Improved touch feedback */
+        @media (hover: none) {
+            button:active,
+            .copy-btn:active,
+            .gift-box:active {
+                transform: scale(0.95);
+                transition: transform 0.1s;
             }
         }
     </style>
