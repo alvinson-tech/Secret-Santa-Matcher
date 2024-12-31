@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secret Santa Revealer 🎅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a472a, #2d5a3c);
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            pointer-events: none;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2),
+                        inset 0 1px 2px rgba(255,255,255,0.2);
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-family: 'Mountains of Christmas', cursive;
+            color: #e4c988;
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e4c988;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: 2px solid rgba(228,201,136,0.3);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #e4c988;
+            box-shadow: 0 0 15px rgba(228,201,136,0.3);
+        }
+
+        button {
+            background: linear-gradient(145deg, #c41e3a, #a01830);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            width: 100%;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(196,30,58,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(196,30,58,0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #links {
+            margin-top: 30px;
+            background: rgba(26,71,42,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .link-item {
+            background: rgba(45,90,60,0.5);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            word-break: break-all;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .link-item:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Reveal page styles */
+        .reveal-container {
+            text-align: center;
+            display: none;
+        }
+
+        .gift-box {
+            font-size: 120px;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: inline-block;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .gift-box:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .name-reveal {
+            font-size: 24px;
+            margin: 30px;
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(20px);
+        }
+
+        .name-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .snowflake {
+            position: fixed;
+            color: white;
+            font-size: 20px;
+            user-select: none;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        .festive-border {
+            border: 2px dashed #e4c988;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(228,201,136,0.3); }
+            50% { box-shadow: 0 0 20px rgba(228,201,136,0.5); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Organizer View -->
+    <div id="organizerView" class="container">
+        <h1>🎅 Secret Santa Organizer 🎄</h1>
+        <div class="festive-border">
+            <div class="input-group">
+                <label>Number of Participants:</label>
+                <input type="number" id="participantCount" min="2" max="20" placeholder="Enter number (2-20)">
+                <button onclick="generateInputs()">Create Form</button>
+            </div>
+        </div>
+        <div id="participantInputs"></div>
+        <button onclick="generateLinks()" id="generateButton" style="display:none">Generate Secret Links</button>
+        <div id="links"></div>
+    </div>
+
+    <!-- Revealer View -->
+    <div id="revealerView" class="container reveal-container">
+        <h1>🎄 Your Secret Santa Match 🎄</h1>
+        <div class="festive-border">
+            <div class="gift-box" onclick="revealMatch()">🎁</div>
+            <div class="name-reveal" id="nameReveal"></div>
+        </div>
+    </div>
+
+    <script>
+        let participants = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        // Show appropriate view based on URL
+        if (code) {
+            document.getElementById('revealerView').style.display = 'block';
+            document.getElementById('organizerView').style.display = 'none';
+            createSnowflakes();
+        } else {
+            document.getElementById('revealerView').style.display = 'none';
+            document.getElementById('organizerView').style.display = 'block';
+        }
+
+        function generateInputs() {
+            const count = parseInt(document.getElementById('participantCount').value);
+            if (count < 2 || count > 20) {
+                alert('Please enter a number between 2 and 20');
+                return;
+            }
+            
+            const container = document.getElementById('participantInputs');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="input-group">
+                        <input required placeholder="Participant Name" name="name${i}">
+                    </div>
+                `;
+            }
+            document.getElementById('generateButton').style.display = 'block';
+        }
+
+        function generateLinks() {
+            participants = [];
+            const inputs = document.querySelectorAll('[name^="name"]');
+            inputs.forEach(input => {
+                if (input.value.trim()) {
+                    participants.push(input.value.trim());
+                }
+            });
+
+            if (participants.length < 2) {
+                alert('Please add at least 2 participants');
+                return;
+            }
+
+            // Shuffle and assign
+            let assigned = [...participants];
+            do {
+                assigned = assigned.sort(() => Math.random() - 0.5);
+            } while (participants.some((p, i) => p === assigned[i]));
+
+            // Generate encrypted links
+            const links = document.getElementById('links');
+            links.innerHTML = '<h3>Share these links with each person:</h3>';
+            links.style.display = 'block';
+
+            participants.forEach((name, i) => {
+                const assignment = assigned[i];
+                const data = JSON.stringify({name: name, match: assignment});
+                const encrypted = CryptoJS.AES.encrypt(data, 'secret-santa-key').toString();
+                const link = `${window.location.href}?code=${encodeURIComponent(encrypted)}`;
+                
+                links.innerHTML += `
+                    <div class="link-item">
+                        <strong>${name}'s Link:</strong><br>
+                        ${link}
+                    </div>
+                `;
+            });
+        }
+
+        function revealMatch() {
+            try {
+                const decrypted = CryptoJS.AES.decrypt(decodeURIComponent(code), 'secret-santa-key').toString(CryptoJS.enc.Utf8);
+                const data = JSON.parse(decrypted);
+                
+                const giftBox = document.querySelector('.gift-box');
+                giftBox.style.transform = 'scale(0) rotate(180deg)';
+                giftBox.style.transition = 'all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    const nameReveal = document.getElementById('nameReveal');
+                    nameReveal.innerHTML = `
+                        <p>🎉 Ho Ho Ho! 🎉</p>
+                        <p>${data.name}, you are Secret Santa for:</p>
+                        <h2 style="color: #e4c988; font-size: 2.5em; margin: 20px 0;">${data.match}</h2>
+                        <p>🎄 Merry Christmas! 🎄</p>
+                    `;
+                    nameReveal.classList.add('visible');
+                }, 1000);
+            } catch (error) {
+                alert('Invalid or expired link!');
+            }
+        }
+
+        function createSnowflakes() {
+            const snowflakes = ['❄', '❅', '❆'];
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                snowflake.style.left = `${Math.random() * 100}vw`;
+                snowflake.style.animation = `fall ${5 + Math.random() * 10}s linear infinite`;
+                snowflake.style.animationDelay = `${-Math.random() * 5}s`;
+                document.body.appendChild(snowflake);
+            }
+        }
+    </script>
+</body>
+</html>
