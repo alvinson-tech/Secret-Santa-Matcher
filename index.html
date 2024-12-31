@@ -7,386 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --holiday-red: #d42426;
-            --holiday-green: #1a472a;
-            --snow-white: #ffffff;
-            --gold: #e4c988;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Space Mono', monospace;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a472a, #2d5a3c);
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin: 20px 0;
-            border: 2px solid var(--gold);
-            backdrop-filter: blur(10px);
-        }
-
-        h1 {
-            color: var(--holiday-red);
-            text-align: center;
-            font-size: 2.2em;
-            margin-bottom: 30px;
-            font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: -1px;
-        }
-
-        .section-heading {
-            color: var(--holiday-green);
-            margin: 20px 0 15px;
-            font-size: 1.2em;
-            letter-spacing: -0.5px;
-        }
-
-        .preset-section {
-            margin-bottom: 30px;
-        }
-
-        .manual-section {
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            margin: 20px 0;
-            flex: 1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--holiday-green);
-            letter-spacing: -0.5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #f8fafc;
-            transition: all 0.2s ease;
-            font-family: 'Space Mono', monospace;
-            letter-spacing: -0.5px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--holiday-red);
-            box-shadow: 0 0 0 3px rgba(212, 36, 38, 0.1);
-        }
-
-        button {
-            background: var(--holiday-red);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            width: 100%;
-            margin: 15px 0;
-            transition: all 0.2s ease;
-            font-family: 'Space Mono', monospace;
-            letter-spacing: -0.5px;
-        }
-
-        button:hover {
-            background: #b81e20;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 36, 38, 0.2);
-        }
-
-        .class-list {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-
-        .student-item {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-bottom: 8px;
-        }
-
-        .student-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            cursor: pointer;
-        }
-
-        .participant-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        #links {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 12px;
-            background: rgba(26, 71, 42, 0.05);
-        }
-
-        .link-item {
-            background: white;
-            padding: 16px;
-            margin: 12px 0;
-            border-radius: 8px;
-            border: 1px solid var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            word-break: break-all;
-        }
-
-        .link-text {
-            flex-grow: 1;
-            margin-right: 16px;
-        }
-
-        .copy-btn {
-            background: var(--holiday-red);
-            border: none;
-            padding: 8px;
-            width: 40px;
-            height: 40px;
-            margin: 0;
-            color: white;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .copy-btn:hover {
-            background: #b81e20;
-            transform: scale(1.1);
-        }
-
-        .gift-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .gift-label {
-            color: var(--holiday-red);
-            font-size: 1em;
-            margin-bottom: 15px;
-            opacity: 0.8;
-            letter-spacing: -0.5px;
-        }
-
-        .gift-box {
-            font-size: 100px;
-            cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: inline-block;
-        }
-
-        .gift-box:hover {
-            transform: scale(1.1);
-        }
-
-        .name-reveal {
-            font-size: 18px;
-            margin: 30px;
-            text-align: center;
-            letter-spacing: -0.5px;
-        }
-
-        /* Enhanced styling for the revealed name */
-        .name-reveal h2 {
-            color: var(--holiday-red);
-            font-size: 1.8em;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(228, 201, 136, 0.2), rgba(228, 201, 136, 0.1));
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            transform: scale(1);
-            transition: transform 0.3s ease;
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px var(--gold),
-                           0 0 10px var(--gold);
-            }
-            to {
-                box-shadow: 0 0 10px var(--gold),
-                           0 0 20px var(--gold);
-            }
-        }
-
-        /* New footer styles */
-        .footer {
-            text-align: center;
-            color: var(--snow-white);
-            padding: 20px;
-            font-size: 14px;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-
-        .footer:hover {
-            opacity: 1;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                font-size: 14px; /* Base font size reduced for mobile */
-            }
-
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 1.6em;
-                margin-bottom: 20px;
-            }
-
-            .section-heading {
-                font-size: 1em;
-            }
-
-            input {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-
-            button {
-                font-size: 14px;
-                padding: 10px 20px;
-            }
-
-            .student-item label {
-                font-size: 13px;
-            }
-
-            .link-item {
-                font-size: 13px;
-            }
-
-            .gift-label {
-                font-size: 0.9em;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .name-reveal {
-                font-size: 14px;
-            }
-
-            .name-reveal h2 {
-                font-size: 1.5em;
-                padding: 12px;
-            }
-
-            .gift-box {
-                font-size: 60px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            body {
-                font-size: 13px;
-            }
-
-            h1 {
-                font-size: 1.4em;
-            }
-
-            .name-reveal h2 {
-                font-size: 1.3em;
-                padding: 10px;
-            }
-        }
-
-        /* Fix for iOS input zoom */
-        @supports (-webkit-touch-callout: none) {
-            input, 
-            select, 
-            textarea {
-                font-size: 16px !important;
-            }
-        }
-
-        /* Prevent pull-to-refresh on mobile */
-        html, body {
-            overscroll-behavior-y: contain;
-        }
-
-        /* Improved touch feedback */
-        @media (hover: none) {
-            button:active,
-            .copy-btn:active,
-            .gift-box:active {
-                transform: scale(0.95);
-                transition: transform 0.1s;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="organizerView" class="container">
         <h1>🎅 Secret Santa Matcher ✨</h1>
         
-        <div class="preset-section">
-            <h2 class="section-heading">Presets</h2>
-            <button onclick="loadClassList()" style="background-color: var(--holiday-green);">Class 4A</button>
-        </div>
-
-        <div class="manual-section">
-            <h2 class="section-heading">Manual Entry</h2>
-            <div class="input-group">
-                <label>Number of Participants:</label>
-                <input type="number" id="participantCount" min="2" max="100" placeholder="Enter number (2-100)">
-                <button onclick="generateInputs()">Create Form</button>
+        <div class="sections-container">
+            <div class="preset-section">
+                <div class="preset-section">
+                    <h2 class="section-heading">Presets</h2>
+                    <button onclick="loadClassList()" style="background-color: var(--holiday-green);">Class 4A</button>
+                </div>
+            </div>
+            <div class="manual-section">
+                <div class="manual-section">
+                    <h2 class="section-heading">Manual Entry</h2>
+                    <div class="input-group">
+                        <label>Number of Participants:</label>
+                        <input type="number" id="participantCount" min="2" max="100" placeholder="Enter number (2-100)">
+                        <button onclick="generateInputs()">Create Form</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -525,14 +167,14 @@
             } while (participants.some((p, i) => p === assigned[i]));
 
             const links = document.getElementById('links');
-            links.innerHTML = '<h3 style="margin-bottom: 20px; color: var(--holiday-green);">Here is your Secret Santa List:</h3>';
-            links.style.display = 'block';
+            links.innerHTML = '<h3 style="margin-bottom: 20px; color: var(--holiday-green);">Here is the Secret Santa List:</h3>';
+            const linksGrid = document.createElement('div');
+            linksGrid.className = 'links-grid';
+            links.appendChild(linksGrid);
 
             participants.forEach((name, i) => {
                 const assignment = assigned[i];
-                // Create a shorter data structure
                 const data = `${name}|${assignment}`;
-                // Use a shorter encryption method
                 const encrypted = btoa(data).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
                 const link = `${window.location.origin}${window.location.pathname}?c=${encrypted}`;
                 
@@ -542,13 +184,14 @@
                 div.innerHTML = `
                     <div class="link-text">
                         <strong>${name}'s Link</strong><br>
-                        <span id="${linkId}">${link}</span>
+                        <span id="${linkId}" style="display: none">${link}</span>
+                        <a href="${link}" target="_blank">Link #${String(i + 1).padStart(3, '0')}</a>
                     </div>
                     <button class="copy-btn" onclick="copyLink('${linkId}')" title="Copy Link">
                         <i class="fas fa-copy"></i>
                     </button>
                 `;
-                links.appendChild(div);
+                linksGrid.appendChild(div);
             });
         }
 
@@ -569,6 +212,8 @@
                         <p>${name}, you are Secret Santa for:</p>
                         <h2>${match}</h2>
                         <p>🎄 Merry Christmas! 🎄</p>
+                        <p>Be a Good Santa 🎅</p>
+                        <p>Deliver your 🎁 gifts on time! </p>
                     `;
                     nameReveal.style.opacity = '0';
                     nameReveal.style.transform = 'translateY(20px)';
@@ -586,13 +231,20 @@
 
         async function copyLink(linkId) {
             const linkText = document.getElementById(linkId).textContent;
-            const success = await copyToClipboard(linkText);
             const btn = event.target.closest('.copy-btn');
             
-            btn.innerHTML = success ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-copy"></i>';
-            }, 2000);
+            try {
+                await navigator.clipboard.writeText(linkText);
+                btn.classList.add('success');
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btn.innerHTML = '<i class="fas fa-copy"></i>';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
         }
     </script>
 </body>
