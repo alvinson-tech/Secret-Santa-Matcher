@@ -41,11 +41,18 @@
     </div>
 
     <div id="revealerView" class="container" style="display:none">
+        <audio id="backgroundMusic" loop>
+            <source src="christmas.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
         <h1>Your Secret Santa Match 🫂</h1>
         <div class="gift-container">
             <div class="gift-label">Click the gift to reveal!</div>
             <div class="gift-box" onclick="revealMatch()">🎁</div>
             <div class="name-reveal" id="nameReveal"></div>
+        </div>
+        <div class="audio-control" onclick="toggleMusic()">
+            <i class="fas fa-volume-up"></i>
         </div>
     </div>
 
@@ -384,18 +391,28 @@
 
         function revealMatch() {
             try {
+                // Handle music first
+                if (!isMusicPlaying) {
+                    music.play().catch(error => {
+                        console.log("Audio playback failed:", error);
+                    });
+                    isMusicPlaying = true;
+                    document.querySelector('.audio-control i').className = 'fas fa-volume-up';
+                }
+
                 const decoded = atob(code.replace(/-/g, '+').replace(/_/g, '/'));
                 const [name, match] = decoded.split('|');
                 
+                const container = document.getElementById('revealerView');
                 const giftBox = document.querySelector('.gift-box');
                 const nameReveal = document.getElementById('nameReveal');
                 
                 // Create flash overlay if it doesn't exist
-                let flashOverlay = document.querySelector('.flash-overlay');
+                let flashOverlay = container.querySelector('.flash-overlay');
                 if (!flashOverlay) {
                     flashOverlay = document.createElement('div');
                     flashOverlay.className = 'flash-overlay';
-                    document.body.appendChild(flashOverlay);
+                    container.appendChild(flashOverlay);
                 }
 
                 // Animation sequence
@@ -436,6 +453,7 @@
                 animationSequence();
                 
             } catch (error) {
+                console.error('Reveal error:', error);
                 alert('Invalid or expired link!');
             }
         }
@@ -481,6 +499,52 @@
         document.addEventListener('DOMContentLoaded', () => {
             createSnowflakes();
         });
-    </script>
+
+        let isMusicPlaying = false;
+        const music = document.getElementById('backgroundMusic');
+
+        // Set initial volume and load audio
+        music.volume = 0.2;
+        music.load();
+
+        // Only initialize audio if we're on the reveal page
+        function initializeAudio() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('c');
+            
+            // Only proceed if we're on the reveal page
+            if (!code) return;
+
+            // Try to play immediately on reveal page load
+            music.play().then(() => {
+                isMusicPlaying = true;
+            }).catch(() => {
+                // If auto-play failed, wait for click
+                document.addEventListener('click', playAudio, { once: true });
+            });
+        }
+
+        function playAudio() {
+            music.play();
+            isMusicPlaying = true;
+            document.querySelector('.audio-control i').className = 'fas fa-volume-up';
+        }
+
+        function toggleMusic() {
+            const audioControl = document.querySelector('.audio-control i');
+            
+            if (isMusicPlaying) {
+                music.pause();
+                audioControl.className = 'fas fa-volume-mute';
+            } else {
+                music.play();
+                audioControl.className = 'fas fa-volume-up';
+            }
+            
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeAudio);
+        </script>
 </body>
 </html>
