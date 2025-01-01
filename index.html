@@ -57,7 +57,9 @@
             emailjs.init("ufFSTjFy0xSRzcey3"); // Replace with your actual public key
         })();
 
-        // Add this new function for sending emails
+        //"service_f0z7tah", // Replace with your service ID
+        //"template_z4kspec", // Replace with your template ID
+
         async function sendEmails() {
             const emailProgress = document.createElement('div');
             emailProgress.id = 'emailProgress';
@@ -73,7 +75,18 @@
             for (const item of linkItems) {
                 const name = item.querySelector('strong').textContent.replace("'s Link", '');
                 const link = item.querySelector('span').textContent;
-                const email = classStudentsData[name]?.email;
+                
+                // First check if it's a preset student
+                let email = classStudentsData[name]?.email;
+                
+                // If not a preset student, check for manual email inputs
+                if (!email) {
+                    const nameIndex = participants.indexOf(name);
+                    if (nameIndex !== -1) {
+                        const emailInput = document.querySelector(`[name="email${nameIndex}"]`);
+                        email = emailInput ? emailInput.value : null;
+                    }
+                }
                 
                 if (!email) {
                     emailProgress.innerHTML += `<div style="color: red">⚠️ No email found for ${name}</div>`;
@@ -82,8 +95,8 @@
                 
                 try {
                     await emailjs.send(
-                        "service_f0z7tah", // Replace with your service ID
-                        "template_z4kspec", // Replace with your template ID
+                        "service_f0z7tah",
+                        "template_z4kspec",
                         {
                             to_name: name,
                             to_email: email,
@@ -91,7 +104,7 @@
                         }
                     );
                     successCount++;
-                    emailProgress.innerHTML += `<div style="color: green">✅ Sent to ${name}</div>`;
+                    emailProgress.innerHTML += `<div style="color: green">✅ Sent to ${name} (${email})</div>`;
                 } catch (error) {
                     emailProgress.innerHTML += `<div style="color: red">❌ Failed to send to ${name}: ${error.message}</div>`;
                 }
@@ -106,14 +119,14 @@
             "Binusha": { email: "" },
             "Aakanksha": { email: "" },
             "Abdul Touheed": { email: "" },
-            "Abhishek A": { email: "" },
+            "Abhishek A": { email: "abhishekatholi42@gmail.com" },
             "Abhishek K": { email: "" },
             "Abhishek S S": { email: "" },
             "Aditya Suresh": { email: "" },
             "Akash Surendra": { email: "" },
             "Akshata Suresh": { email: "" },
             "Akshay H": { email: "" },
-            "Alvin": { email: "" },
+            "Alvin": { email: "alvinsonny15@gmail.com" },
             "Amulya": { email: "" },
             "Anaghashree": { email: "" },
             "Ananya": { email: "" },
@@ -227,15 +240,7 @@
             }
 
             document.getElementById('participantCount').value = selectedStudents.length;
-            generateInputs();
-
-            const inputs = document.querySelectorAll('[name^="name"]');
-            inputs.forEach((input, index) => {
-                if (selectedStudents[index]) {
-                    input.value = selectedStudents[index];
-                }
-            });
-
+            generatePresetInputs(selectedStudents);  // New function for preset students
             document.getElementById('generateButton').style.display = 'block';
         }
 
@@ -249,13 +254,48 @@
             const container = document.getElementById('participantInputs');
             container.innerHTML = '';
             
+            // This is for manual entry only, so we keep email input
             for (let i = 0; i < count; i++) {
                 const div = document.createElement('div');
                 div.className = 'input-group';
-                div.innerHTML = `<input required placeholder="Participant ${i + 1}" name="name${i}">`;
+                div.innerHTML = `
+                    <div style="display: flex; gap: 10px;">
+                        <input 
+                            required 
+                            placeholder="Participant ${i + 1} Name" 
+                            name="name${i}" 
+                            style="flex: 1;">
+                        <input 
+                            type="email" 
+                            required 
+                            placeholder="Email" 
+                            name="email${i}" 
+                            style="flex: 1;">
+                    </div>
+                `;
                 container.appendChild(div);
             }
             document.getElementById('generateButton').style.display = 'block';
+        }
+
+        function generatePresetInputs(selectedStudents) {
+            const container = document.getElementById('participantInputs');
+            container.innerHTML = '';
+            
+            // For preset students, we only show names (no email input needed)
+            selectedStudents.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'input-group';
+                div.innerHTML = `
+                    <input 
+                        required 
+                        value="${student}" 
+                        name="name${index}" 
+                        style="flex: 1;"
+                        readonly>
+                `;
+                container.appendChild(div);
+            });
         }
 
         async function copyToClipboard(text) {
@@ -270,10 +310,27 @@
 
         function generateLinks() {
             participants = [];
-            const inputs = document.querySelectorAll('[name^="name"]');
-            inputs.forEach(input => {
+            const manualParticipantData = {};
+            
+            // For preset students
+            const presetInputs = document.querySelectorAll('[name^="name"][readonly]');
+            // For manual entries
+            const manualInputs = document.querySelectorAll('[name^="name"]:not([readonly])');
+            
+            // Handle preset students
+            presetInputs.forEach(input => {
                 if (input.value.trim()) {
                     participants.push(input.value.trim());
+                }
+            });
+
+            // Handle manual entries
+            manualInputs.forEach((input, index) => {
+                if (input.value.trim()) {
+                    const name = input.value.trim();
+                    const email = document.querySelector(`[name="email${index}"]`).value.trim();
+                    participants.push(name);
+                    manualParticipantData[name] = { email: email };
                 }
             });
 
@@ -315,9 +372,10 @@
                 linksGrid.appendChild(div);
             });
 
+            // Add email button
             const emailButton = document.createElement('button');
             emailButton.innerHTML = '📧 Send Emails to All';
-            emailButton.onclick = sendEmails;
+            emailButton.onclick = () => sendEmails(manualParticipantData);
             emailButton.style.marginTop = '20px';
             emailButton.style.backgroundColor = 'var(--holiday-blue)';
             links.appendChild(emailButton);
