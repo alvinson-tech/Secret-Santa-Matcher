@@ -1,4 +1,4 @@
-Secret Santa Website 🎅🎁
+# Secret Santa Website 🎅🎁
 
 This project is a simple and fun Secret Santa website designed to automate the process of managing Secret Santa activities. 
 It uses **HTML** and **CSS** for the front-end design, and **EmailJS** to send personalized invitations and links to participants.
