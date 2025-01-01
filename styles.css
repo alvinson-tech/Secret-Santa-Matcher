@@ -404,6 +404,34 @@ button:hover {
     opacity: 1;
 }
 
+.audio-control {
+    position: absolute;  /* Changed from fixed to absolute */
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.audio-control:hover {
+    transform: scale(1.1);
+    background: white;
+}
+
+.audio-control i {
+    color: var(--holiday-green);
+    font-size: 18px;
+}
+
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -472,6 +500,17 @@ button:hover {
 
     .gift-box {
         font-size: 60px;
+    }
+
+    .audio-control {
+        bottom: 15px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .audio-control i {
+        font-size: 16px;
     }
 }
 
