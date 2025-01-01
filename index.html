@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="snowflakes" aria-hidden="true"></div>
     <div id="organizerView" class="container">
         <h1>🎅 Secret Santa Matcher ✨</h1>
         
@@ -129,7 +130,7 @@
             "Alvin": { email: "alvinsonny15@gmail.com" },
             "Amulya": { email: "" },
             "Anaghashree": { email: "" },
-            "Ananya": { email: "" },
+            "Ananya": { email: "ananya.sonal04@gmail.com" },
             "Aniketha": { email: "" },
             "Ankita": { email: "" },
             "Anushree": { email: "" },
@@ -387,28 +388,53 @@
                 const [name, match] = decoded.split('|');
                 
                 const giftBox = document.querySelector('.gift-box');
-                giftBox.style.transform = 'scale(0)';
-                giftBox.style.transition = 'all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                const nameReveal = document.getElementById('nameReveal');
                 
-                setTimeout(() => {
-                    const nameReveal = document.getElementById('nameReveal');
+                // Create flash overlay if it doesn't exist
+                let flashOverlay = document.querySelector('.flash-overlay');
+                if (!flashOverlay) {
+                    flashOverlay = document.createElement('div');
+                    flashOverlay.className = 'flash-overlay';
+                    document.body.appendChild(flashOverlay);
+                }
+
+                // Animation sequence
+                const animationSequence = async () => {
+                    // 1. Shake animation
+                    giftBox.style.animation = 'shakeGift 0.5s ease-in-out';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // 2. Zoom animation
+                    giftBox.style.animation = 'zoomGift 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    // 3. Flash effect
+                    flashOverlay.style.opacity = '1';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // 4. Hide gift and overlay
+                    giftBox.style.display = 'none';
+                    flashOverlay.style.opacity = '0';
+                    
+                    // 5. Show reveal message with animation
                     nameReveal.innerHTML = `
                         <p>✨ Ho Ho Ho! ✨</p>
                         <p>${name}, you are Secret Santa for:</p>
                         <h2>${match}</h2>
                         <p>🎄 Merry Christmas! 🎄</p>
                         <p>Be a Good Santa 🎅</p>
-                        <p>Deliver your 🎁 gifts on time! </p>
+                        <p>Deliver your 🎁 gifts on time!</p>
                     `;
                     nameReveal.style.opacity = '0';
-                    nameReveal.style.transform = 'translateY(20px)';
-                    nameReveal.style.transition = 'all 0.5s ease-out';
-                    
-                    requestAnimationFrame(() => {
-                        nameReveal.style.opacity = '1';
-                        nameReveal.style.transform = 'translateY(0)';
-                    });
-                }, 800);
+                    nameReveal.style.animation = 'fadeInMessage 1s ease-out forwards';
+                    nameReveal.style.display = 'block';
+                };
+
+                animationSequence();
+                
             } catch (error) {
                 alert('Invalid or expired link!');
             }
@@ -431,6 +457,30 @@
                 console.error('Failed to copy:', err);
             }
         }
+
+        function createSnowflakes() {
+            const snowflakesContainer = document.querySelector('.snowflakes');
+            const snowflakeChars = ['❅', '❆', '❄'];
+            const numberOfSnowflakes = 30;
+
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.style.left = `${Math.random() * 100}vw`;
+                snowflake.style.opacity = Math.random() * 0.6 + 0.2;
+                snowflake.style.fontSize = `${Math.random() * 0.8 + 0.5}em`;
+                // Faster animation duration
+                snowflake.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                // Stagger the start times
+                snowflake.style.animationDelay = `${Math.random() * -20}s`;
+                snowflake.innerHTML = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+                snowflakesContainer.appendChild(snowflake);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createSnowflakes();
+        });
     </script>
 </body>
 </html>
